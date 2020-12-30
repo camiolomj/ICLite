@@ -1,0 +1,34 @@
+Package: ICLite
+Title: Immune Cell Linkage Through Exploratory matrices
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Matthew",
+           family = "Camiolo",
+           role = c("aut", "cre"),
+           email = "camiolomj@upmc.edu",
+           comment = c(ORCID = "0000-0002-9085-6552"))
+Description: ICLite performs deconvolution of bulk sequencing data using 
+             the composition of a mixed cell population.  It requires log 
+             ratio transformed compositional data from cellular assays 
+             such as mass cytometry or other high-dimensional flow cytometry
+             technologies to identify a best fit solution for a data set.  
+             Genes are clustered together using the blockcluster package after
+             a multistep transformation process that includes construction of 
+             correlation matrix and removal of transcripts based on cutoffs
+             for number and strength of interactions.  These parameters,
+             as well as number of clusters assumed for the blockcluster
+             package, are varied by the user to generate numerous solutions 
+             which are then evaluated using a weighted scoring system.  The 
+             usethat::use_vignette("introduction")optimal fit solution is identified based on maximization of 
+             Integrated Completed Likelihood (ICL) from gene clustering and
+             connectivity between gene modules and cell populations.  Package
+             outputs include CSV files of the gene modules and correlation plots
+             of gene module scores versus cell counts.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1.9000
+Imports: 
+    corrplot,
+    blockcluster

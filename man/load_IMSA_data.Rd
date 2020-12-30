@@ -12,9 +12,3 @@ loads immune_cell_logratios and gene_expression_data objects into global environ
 \description{
 Loads gene expression and immune log ratios from the IMSA data set
 }
-\examples{
-
-#' run_ICLite(gene_expression_data, immune_cell_logratios, input_connectivities,
-           input_rho, number_of_clusters)
-
-}

@@ -1,12 +1,6 @@
 #' @title load_IMSA_data
 #' @description Loads gene expression and immune log ratios from the IMSA data set
 #' @return loads immune_cell_logratios and gene_expression_data objects into global environment
-#' @examples
-#'
-#' #' run_ICLite(gene_expression_data, immune_cell_logratios, input_connectivities,
-#'            input_rho, number_of_clusters)
-#'
-
 
 
 load_IMSA_data<-function(){

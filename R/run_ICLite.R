@@ -17,17 +17,6 @@
 #' @param input_rho A vector of rho exclusion values ranging from 0.1 to 0.9.  Gene correlations below this value are converted to 0 in binary space while those above are converted to 1.  Higher cutoffs will result in smaller gene modules
 #' @param number_of_clusters A vector of assumed number of clusters to be used for blockclustering
 #' @return Module to gene connectivity solution and gene module memberships to working directory and global environment
-#' @examples
-#'
-#'load_IMSA_data()
-#'
-#'input_connectivities<-c(50, 100)
-#'input_rho<-c(0.4, 0.425, 0.45, 0.475)
-#'number_of_clusters<-as.list(c(18,22,26,30))
-#'
-#'run_ICLite(gene_expression_data, immune_cell_logratios, input_connectivities,
-#'           input_rho, number_of_clusters)
-#'
 
 run_ICLite<-function(gene_expression_data, immune_cell_logratios, input_connectivities,
                      input_rho, number_of_clusters){

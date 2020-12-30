@@ -38,15 +38,3 @@ of ICLite with varying input parameters.  Running separate tests for correlation
 between genes in a data set is recommended to determine minimum values for input
 rho exclusion.  For general practice, we recommend using no lower than 0.4.
 }
-\examples{
-
-load_IMSA_data()
-
-input_connectivities<-c(50, 100)
-input_rho<-c(0.4, 0.425, 0.45, 0.475)
-number_of_clusters<-as.list(c(18,22,26,30))
-
-run_ICLite(gene_expression_data, immune_cell_logratios, input_connectivities,
-          input_rho, number_of_clusters)
-
-}

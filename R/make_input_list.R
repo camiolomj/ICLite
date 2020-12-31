@@ -7,6 +7,6 @@
 #'
 make_input_list<-function(input_connectivities, input_rho){
 
-  return(as.list(crossing(input_connectivities, input_rho)))
+  return(as.list(dplyr::crossing(input_connectivities, input_rho)))
 
 }

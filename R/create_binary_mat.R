@@ -3,6 +3,7 @@
 #' @param rho_cutoff A vector of rho exclusion values ranging from 0.1 to 0.9.
 #' @param min_connectivity A vector of minimum connectivity values.  Higher cutoffs will result in smaller gene modules
 #' @return A binary matrix based off input cutoff parameters
+#' @export
 
 create_binary_mat<-function(rho_cutoff, min_connectivity){
   filtered_cor_data<-ifelse(bal.cor.matrix>rho_cutoff, 1,0)

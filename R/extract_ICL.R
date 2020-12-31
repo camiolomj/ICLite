@@ -2,6 +2,7 @@
 #' @description Extracts ICL value from blockclustering solution inside run_ICLite
 #' @param solution Gene blockclustering solution from inside run_ICLite
 #' @return ICL value
+#' @export
 
 extract_ICL<-function(solution){
 

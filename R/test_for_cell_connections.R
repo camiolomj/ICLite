@@ -2,6 +2,7 @@
 #' @description Quantifies number of positive correlations between gene modules and cells for an input gene clustering solution
 #' @param solution A blockclustering solution
 #' @return An integer value of total positive correlations between cells and gene modules
+#' @export
 
 test_for_cell_connections<-function(solution){
 

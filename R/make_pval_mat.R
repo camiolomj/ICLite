@@ -2,6 +2,7 @@
 #' @description Calculated matrix of p-values for correlation between gene modules and cells
 #' @param solution Gene blockclustering solution from inside run_ICLite
 #' @return Matrix of p-values from Spearman's rho calculation between gene module scoring and immune cell log ratios
+#' @export
 
 make_pval_mat<-function(solution){
 

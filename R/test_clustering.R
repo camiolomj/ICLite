@@ -3,6 +3,7 @@
 #' @param test_mat A binary matrix generated as part of "run_ICLite"
 #' @param num_clust The assumed number of clusters to be used for blockclustering
 #' @return A blockcluster solution from the input binary matrix using the assumed number of clusters
+#' @export
 
 test_clustering<-function(test_mat, num_clust){
 

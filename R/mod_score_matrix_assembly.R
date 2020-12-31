@@ -2,6 +2,7 @@
 #' @description Wrapper for scoring module expression across individuals
 #' @param mod_list A list of character strings indicating gene module membership
 #' @return A matrix of module gene expression across individuals
+#' @export
 
 mod_score_matrix_assembly<-function(mod_list){
 

@@ -1,7 +1,7 @@
 #' @title load_IMSA_data
 #' @description Loads gene expression and immune log ratios from the IMSA data set
 #' @return loads immune_cell_logratios and gene_expression_data objects into global environment
-
+#' @export
 
 load_IMSA_data<-function(){
 

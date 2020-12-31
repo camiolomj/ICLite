@@ -32,4 +32,5 @@ RoxygenNote: 7.1.1.9000
 Imports: 
     corrplot,
     blockcluster,
-    dplyr
+    dplyr,
+    tidyr

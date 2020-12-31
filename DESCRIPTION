@@ -19,7 +19,7 @@ Description: ICLite performs deconvolution of bulk sequencing data using
              as well as number of clusters assumed for the blockcluster
              package, are varied by the user to generate numerous solutions 
              which are then evaluated using a weighted scoring system.  The 
-             usethat::use_vignette("introduction")optimal fit solution is identified based on maximization of 
+             optimal fit solution is identified based on maximization of 
              Integrated Completed Likelihood (ICL) from gene clustering and
              connectivity between gene modules and cell populations.  Package
              outputs include CSV files of the gene modules and correlation plots

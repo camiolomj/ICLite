@@ -50,7 +50,7 @@ run_ICLite<-function(gene_expression_data, immune_cell_logratios, input_connecti
     connection_values<<-lapply(unpacked_solutions, test_for_cell_connections)
 
     ##Index of solution input parameters
-    choice_mat<<-as.data.frame(crossing(number_of_clusters, crossing(input_connectivities, input_rho)))
+    choice_mat<<-as.data.frame(tidyr::crossing(number_of_clusters, tidyr::crossing(input_connectivities, input_rho)))
 
     ##Weighted scoring of solutions
     if(length(ICL_values)-length(which(is.na(ICL_values)==T))>1){

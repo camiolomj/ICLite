@@ -24,101 +24,115 @@ run_ICLite<-function(gene_expression_data, immune_cell_logratios, input_connecti
 
     number_of_clusters<<-as.list(number_of_clusters)
 
-    ##Make correlation matrix from transcriptional data
-    bal.cor.matrix<<-make_gene_cor_mat(gene_expression_data)
+    if(length(input_rho)<3){
+      print("Please include at least 3 possible rho cutoffs")
+    }else if(length(input_connectivities)<2){
+      print("Please include at least 2 possible connectivity cutoffs")
+    }else if(length(number_of_clusters)<2){
+      print("Please include at least 2 possible gene cluster number inputs")
+    }else if(max(input_rho)>0.9){
+      print("Please use input rho values between 0.1 and 0.9")
+    }else{
 
-    ##Make scaled expression data to be used in module scoring
-    scaled_expression_data<<-scale(t(gene_expression_data))
+      ##Make correlation matrix from transcriptional data
+      bal.cor.matrix<<-make_gene_cor_mat(gene_expression_data)
 
-    ##Make list of input parameter combinations from ranges of connectivity cutoffs and rho exclusions
-    mat_input_list<<-make_input_list(input_connectivities, input_rho)
+      ##Make scaled expression data to be used in module scoring
+      scaled_expression_data<<-scale(t(gene_expression_data))
 
-    ##Create binary matrices from gene expression correlation values based on input parameters
-    test_mat_list<<-mapply(create_binary_mat, mat_input_list$input_rho, mat_input_list$input_connectivities)
+      ##Make list of input parameter combinations from ranges of connectivity cutoffs and rho exclusions
+      mat_input_list<<-make_input_list(input_connectivities, input_rho)
 
-    ##Generate gene clustering solutions using blockCluster
-    test_solutions<<-lapply(number_of_clusters, solution_by_num_clust)
-    unpacked_solutions<<-unlist(test_solutions)
+      ##Create binary matrices from gene expression correlation values based on input parameters
+      test_mat_list<<-mapply(create_binary_mat, mat_input_list$input_rho, mat_input_list$input_connectivities)
 
-    ##Extract ICL values for evaluation of clustering solutions
-    ICL_values<<-lapply(unpacked_solutions, extract_ICL)
+      ##Generate gene clustering solutions using blockCluster
+      test_solutions<<-lapply(number_of_clusters, solution_by_num_clust)
+      unpacked_solutions<<-unlist(test_solutions)
 
-    ##Create matrix size score to penalize small solutions
-    mat_sizes<<-lapply(unpacked_solutions, matrix_size_penalty_calc)
+      if(length(which(is.na(unpacked_solutions)==T))==length(unpacked_solutions)){
+        print("Gene clustering failed.  Please vary your input parameters")
+      }else{
+        ##Extract ICL values for evaluation of clustering solutions
+        ICL_values<<-lapply(unpacked_solutions, extract_ICL)
 
-    ##Calculate number of positive correlations between gene modules and cell log ratios
-    connection_values<<-lapply(unpacked_solutions, test_for_cell_connections)
+        ##Create matrix size score to penalize small solutions
+        mat_sizes<<-lapply(unpacked_solutions, matrix_size_penalty_calc)
 
-    ##Index of solution input parameters
-    choice_mat<<-as.data.frame(tidyr::crossing(number_of_clusters, tidyr::crossing(input_connectivities, input_rho)))
+        ##Calculate number of positive correlations between gene modules and cell log ratios
+        connection_values<<-lapply(unpacked_solutions, test_for_cell_connections)
 
-    ##Weighted scoring of solutions
-    if(length(ICL_values)-length(which(is.na(ICL_values)==T))>1){
-    tradeoff_score<<-scale(unlist(ICL_values))+1.5*((1.4*scale(unlist(connection_values))/as.numeric(choice_mat$number_of_clusters))+
+        ##Index of solution input parameters
+        choice_mat<<-as.data.frame(tidyr::crossing(number_of_clusters, tidyr::crossing(input_connectivities, input_rho)))
+
+        ##Weighted scoring of solutions
+        if(length(ICL_values)-length(which(is.na(ICL_values)==T))>1){
+        tradeoff_score<<-scale(unlist(ICL_values))+1.5*((1.4*scale(unlist(connection_values))/as.numeric(choice_mat$number_of_clusters))+
                                                       scale(unlist(mat_sizes)))
-    }else{tradeoff_score<-ifelse(!is.na(ICL_values), 1,0)}
+        }else{tradeoff_score<-ifelse(!is.na(ICL_values), 1,0)}
 
-    ##Identify optimal conditions
-    chosen_num_clust<<-as.numeric(choice_mat[which(tradeoff_score==max(tradeoff_score, na.rm = T)),1])
-    chosen_connectivity<<-as.numeric(choice_mat[which(tradeoff_score==max(tradeoff_score, na.rm = T)),2])
-    chosen_rho<<-as.numeric(choice_mat[which(tradeoff_score==max(tradeoff_score, na.rm = T)),3])
-    accepted_solution<<-unlist(unpacked_solutions[[which(tradeoff_score==max(tradeoff_score, na.rm = T))]])
+        ##Identify optimal conditions
+        chosen_num_clust<<-as.numeric(choice_mat[which(tradeoff_score==max(tradeoff_score, na.rm = T)),1])
+        chosen_connectivity<<-as.numeric(choice_mat[which(tradeoff_score==max(tradeoff_score, na.rm = T)),2])
+        chosen_rho<<-as.numeric(choice_mat[which(tradeoff_score==max(tradeoff_score, na.rm = T)),3])
+        accepted_solution<<-unlist(unpacked_solutions[[which(tradeoff_score==max(tradeoff_score, na.rm = T))]])
 
-    ##Construct final modules and export them as csv files
-    all_mods<<-unique(accepted_solution@rowclass)
-    gene_mod_membership<<-factor(accepted_solution@rowclass)
-    gene_module_lists<<-list()
+        ##Construct final modules and export them as csv files
+        all_mods<<-unique(accepted_solution@rowclass)
+        gene_mod_membership<<-factor(accepted_solution@rowclass)
+        gene_module_lists<<-list()
 
-    for(g in 1:length(all_mods)){
+        for(g in 1:length(all_mods)){
 
-      write.csv(rownames(accepted_solution@data[gene_mod_membership==all_mods[g],]),
-                paste0("Gene Module ", all_mods[g]+1, " genes.csv"))
-    }
-
-    ##Create cell vs module correlation plots for significant interactions
-    cell_type_short<<-colnames(immune_cell_logratios)
-    cell_type_short<<-gsub("[.]", "_", cell_type_short)
-
-    for(g in 1:length(all_mods)){
-
-      mod<-rownames(accepted_solution@data[gene_mod_membership==all_mods[g],])
-      gene_module_lists[[g]]<-mod
-      score_for_mod<-mod_score(mod)
-
-      for(c in 1:ncol(immune_cell_logratios)){
-
-        test<-cor.test(score_for_mod, immune_cell_logratios[,c], method = "spearman")
-        if(test$p.value<0.1&test$estimate>0){
-
-          png(paste0(cell_type_short[c], " vs Gene Mod ", (all_mods[g]+1), ".png"), height = 800,
-              pointsize = 12, width = 800, res = 300)
-          par(mar =c(3.9, 3.9, 2.5, 1.6))
-          plot(score_for_mod~immune_cell_logratios[,c], pch = 16, cex.main = 1.2, cex.axis = 1.2,
-            cex.lab = ifelse(nchar(cell_type_short[c])>10, .95, 1.1),
-            ylab = paste0("Module ", (all_mods[g]+1), " Score"),
-            xlab = paste0(cell_type_short[c]),
-            main = paste(paste0("rho = ", round(test$estimate, 3)),
-                         paste0("p-value = ", round(test$p.value, 4)), sep="\n"))
-          abline(lm(score_for_mod~immune_cell_logratios[,c]), lty = 2, col = "red")
-          dev.off()
+          write.csv(rownames(accepted_solution@data[gene_mod_membership==all_mods[g],]),
+                  paste0("Gene Module ", all_mods[g]+1, " genes.csv"))
         }
+
+        ##Create cell vs module correlation plots for significant interactions
+        cell_type_short<<-colnames(immune_cell_logratios)
+        cell_type_short<<-gsub("[.]", "_", cell_type_short)
+
+        for(g in 1:length(all_mods)){
+
+          mod<-rownames(accepted_solution@data[gene_mod_membership==all_mods[g],])
+          gene_module_lists[[g]]<<-mod
+          score_for_mod<-mod_score(mod)
+
+          for(c in 1:ncol(immune_cell_logratios)){
+
+            test<-cor.test(score_for_mod, immune_cell_logratios[,c], method = "spearman")
+            if(test$p.value<0.1&test$estimate>0){
+
+              png(paste0(cell_type_short[c], " vs Gene Mod ", (all_mods[g]+1), ".png"), height = 800,
+                  pointsize = 12, width = 800, res = 300)
+              par(mar =c(3.9, 3.9, 2.5, 1.6))
+              plot(score_for_mod~immune_cell_logratios[,c], pch = 16, cex.main = 1.2, cex.axis = 1.2,
+                cex.lab = ifelse(nchar(cell_type_short[c])>10, .95, 1.1),
+                ylab = paste0("Module ", (all_mods[g]+1), " Score"),
+                xlab = paste0(cell_type_short[c]),
+                main = paste(paste0("rho = ", round(test$estimate, 3)),
+                           paste0("p-value = ", round(test$p.value, 4)), sep="\n"))
+              abline(lm(score_for_mod~immune_cell_logratios[,c]), lty = 2, col = "red")
+              dev.off()
+            }
+          }
+        }
+
+        names(gene_module_lists)<-paste0("Module ", (all_mods[g]+1))
+
+        ##Create a corrplot for modules versus cells
+        my_palette <<- colorRampPalette(c("purple", "black", "yellow"))(n = 799)
+        cell.v.gene.cor<<-make_cor_mat(accepted_solution)
+        cell.v.gene.pval<<-make_pval_mat(accepted_solution)
+        colnames(cell.v.gene.cor)<-paste0("Module ", 1:chosen_num_clust)
+        rownames(cell.v.gene.cor)<-cell_type_short
+
+        png("mod solution corrplot.png", height = 5*500, width = 5*500, res = 300)
+        par(mar = c( 5, 3, 3,8))
+        corrplot::corrplot(cell.v.gene.cor, method="circle", is.corr=FALSE,
+                 col=my_palette, tl.col="black",
+                 p.mat = cell.v.gene.pval, sig.level = 0.05, insig = "blank")
+        dev.off()
       }
     }
-
-    names(gene_module_lists)<-paste0("Module ", (all_mods[g]+1))
-
-    ##Create a corrplot for modules versus cells
-    my_palette <<- colorRampPalette(c("purple", "black", "yellow"))(n = 799)
-    cell.v.gene.cor<<-make_cor_mat(accepted_solution)
-    cell.v.gene.pval<<-make_pval_mat(accepted_solution)
-    colnames(cell.v.gene.cor)<-paste0("Module ", 1:chosen_num_clust)
-    rownames(cell.v.gene.cor)<-cell_type_short
-
-    png("mod solution corrplot.png", height = 5*500, width = 5*500, res = 300)
-    par(mar = c( 5, 3, 3,8))
-    corrplot::corrplot(cell.v.gene.cor, method="circle", is.corr=FALSE,
-             col=my_palette, tl.col="black",
-             p.mat = cell.v.gene.pval, sig.level = 0.05, insig = "blank")
-    dev.off()
-
-}
+  }

@@ -9,12 +9,19 @@
 #' Finding the optimal solution for a data set may require running multiple iterations
 #' of ICLite with varying input parameters.  Running separate tests for correlation
 #' between genes in a data set is recommended to determine minimum values for input
-#' rho exclusion.  For general practice, we recommend using no lower than 0.4.
+#' rho exclusion.  For general practice, we recommend using no lower than 0.4.  The
+#' number of assumed gene clusters should be considered in relation to the total size
+#' of the transcriptional data set.  Though ICLite does penalize for over-clustering,
+#' it will only consider solutions from the input vector.  Therefore, initial runs
+#' may benefit from a broad array of values that may be narrowed on successive iterations.
+#'
+#' Users should include a vector of at least 2 input parameters for minimum connectivity,
+#' rho cutoff and number of clusters.
 #'
 #' @param gene_expression_data A matrix of normalized gene expression data where columns represent individuals and rows represent features (e.g. genes)
 #' @param immune_cell_logratios A matrix of corresponding cell log ratios where rows represent individuals and columns represent features (e.g. cells).  Transformation of percentage values using the "compositions" package is recommended prior to use
 #' @param input_connectivities A vector of minimum connectivity values.  Higher cutoffs will result in smaller gene modules
-#' @param input_rho A vector of rho exclusion values ranging from 0.1 to 0.9.  Gene correlations below this value are converted to 0 in binary space while those above are converted to 1.  Higher cutoffs will result in smaller gene modules
+#' @param input_rho A vector of rho exclusion values ranging from 0.3 to 0.9.  Gene correlations below this value are converted to 0 in binary space while those above are converted to 1.  Higher cutoffs will result in smaller gene modules
 #' @param number_of_clusters A vector of assumed number of clusters to be used for blockclustering
 #' @return Module to gene connectivity solution and gene module memberships to working directory and global environment
 #' @export
@@ -24,14 +31,16 @@ run_ICLite<-function(gene_expression_data, immune_cell_logratios, input_connecti
 
     number_of_clusters<<-as.list(number_of_clusters)
 
-    if(length(input_rho)<3){
-      print("Please include at least 3 possible rho cutoffs")
+    if(length(input_rho)<2){
+      print("Please include at least 2 possible rho cutoffs")
     }else if(length(input_connectivities)<2){
       print("Please include at least 2 possible connectivity cutoffs")
     }else if(length(number_of_clusters)<2){
       print("Please include at least 2 possible gene cluster number inputs")
     }else if(max(input_rho)>0.9){
-      print("Please use input rho values between 0.1 and 0.9")
+      print("Please use input rho values between 0.3 and 0.9")
+    }else if(min(input_rho)<0.3){
+      print("Please use input rho values between 0.3 and 0.9")
     }else{
 
       ##Make correlation matrix from transcriptional data

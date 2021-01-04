@@ -15,11 +15,17 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
+library(devtools)
+install_github("camiolomj/ICLite")
+
 library(ICLite)
 
 ##Setup matrix generation parameters
-input_connectivities<-c(50, 100)
-input_rho<-c(0.4, 0.425, 0.45, 0.475)
+##Limiting input parameters will give significantly faster run times
+##The vectors below would yield a thorough but lengthy run 
+
+input_connectivities<-c(50, 100, 200)
+input_rho<-c(0.4, 0.425, 0.45, 0.475, 0.5, 0.525)
 number_of_clusters<-as.list(c(18,22,26,30))
 
 ##Import IMSA dataset for example runs
@@ -28,6 +34,11 @@ load_IMSA_data()#Includes gene_expression_data and immune_cell_logratios objects
 ##Run ICLite
 run_ICLite(gene_expression_data, immune_cell_logratios, input_connectivities,
                      input_rho, number_of_clusters)
+
+## A complete run will yield CSV files of gene module memberships as well as 
+## the "gene_module_lists" object in the Global Environment.  This object may 
+## be passed on for downstream analysis using tools such as Gene Ontology 
+## enrichment analysis
 
 ```
 

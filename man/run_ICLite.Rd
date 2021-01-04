@@ -19,7 +19,7 @@ run_ICLite(
 
 \item{input_connectivities}{A vector of minimum connectivity values.  Higher cutoffs will result in smaller gene modules}
 
-\item{input_rho}{A vector of rho exclusion values ranging from 0.1 to 0.9.  Gene correlations below this value are converted to 0 in binary space while those above are converted to 1.  Higher cutoffs will result in smaller gene modules}
+\item{input_rho}{A vector of rho exclusion values ranging from 0.3 to 0.9.  Gene correlations below this value are converted to 0 in binary space while those above are converted to 1.  Higher cutoffs will result in smaller gene modules}
 
 \item{number_of_clusters}{A vector of assumed number of clusters to be used for blockclustering}
 }
@@ -36,5 +36,12 @@ load_IMSA_data()
 Finding the optimal solution for a data set may require running multiple iterations
 of ICLite with varying input parameters.  Running separate tests for correlation
 between genes in a data set is recommended to determine minimum values for input
-rho exclusion.  For general practice, we recommend using no lower than 0.4.
+rho exclusion.  For general practice, we recommend using no lower than 0.4.  The
+number of assumed gene clusters should be considered in relation to the total size
+of the transcriptional data set.  Though ICLite does penalize for over-clustering,
+it will only consider solutions from the input vector.  Therefore, initial runs
+may benefit from a broad array of values that may be narrowed on successive iterations.
+
+Users should include a vector of at least 2 input parameters for minimum connectivity,
+rho cutoff and number of clusters.
 }

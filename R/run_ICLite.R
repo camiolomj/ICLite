@@ -76,8 +76,8 @@ run_ICLite<-function(gene_expression_data, immune_cell_logratios, input_connecti
 
         ##Weighted scoring of solutions
         if(length(ICL_values)-length(which(is.na(ICL_values)==T))>1){
-        tradeoff_score<<-scale(unlist(ICL_values))+1.5*((1.4*scale(unlist(connection_values))/as.numeric(choice_mat$number_of_clusters))+
-                                                      scale(unlist(mat_sizes)))
+                tradeoff_score<<-scale(unlist(ICL_values))+ 1.6*scale(unlist(mat_sizes))+
+          1.2*(scale(unlist(connection_values)/(as.numeric(choice_mat$number_of_clusters))))
         }else{tradeoff_score<-ifelse(!is.na(ICL_values), 1,0)}
 
         ##Identify optimal conditions

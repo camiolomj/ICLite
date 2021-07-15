@@ -6,6 +6,9 @@
 
 mod_score<-function(module){
 
-  return(rowMeans(scaled_expression_data[,match(module, colnames(scaled_expression_data))]))
-
+  if(length(module)>1){
+    return(rowMeans(scaled_expression_data[,match(module, colnames(scaled_expression_data))]))
+  }else{
+    return(scaled_expression_data[,match(module, colnames(scaled_expression_data))])
+  }
 }

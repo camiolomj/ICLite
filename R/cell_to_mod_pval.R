@@ -12,7 +12,8 @@ cell_to_mod_pval<-function(score_mat){
   for(y in 1:total_modules){
 
     for(x in 1:ncol(immune_cell_logratios)){
-      cell_to_mod_mat[x,y]<-cor.test(immune_cell_logratios[,x], score_mat[,y], method = "spearman")$p.value
+      cell_to_mod_mat[x,y]<-cor.test(immune_cell_logratios[,x], score_mat[,y],
+                                     alternative = "greater", method = "spearman")$p.value
     }
   }
 

@@ -33,4 +33,5 @@ Imports:
     corrplot,
     blockcluster,
     dplyr,
-    tidyr
+    tidyr,
+    RColorBrewer

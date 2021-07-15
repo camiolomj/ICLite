@@ -24,4 +24,8 @@ plot_fit_score<-function(){
   plot(b)
 
   dev.off()
+
+  print(paste0("The optimal conditions are: rho = ", chosen_rho))
+  print(paste0("Connectivity = ", chosen_connectivity))
+  print(paste0("Number of clusters = ", chosen_num_clust))
 }

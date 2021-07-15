@@ -35,4 +35,4 @@ Imports:
     dplyr,
     tidyr,
     RColorBrewer,
-    ggplot
+    ggplot2
